@@ -7,9 +7,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(collectionResourceRel = "people", path = "people")
-public interface PersonRepository extends PagingAndSortingRepository<Person, Long>, CrudRepository<Person,Long> {
+@RepositoryRestResource(collectionResourceRel = "votingsession", path = "votingsession")
+public interface VotingSessionRepository extends PagingAndSortingRepository<VotingSession, Long>, CrudRepository<VotingSession,Long> {
 
-	List<Person> findByLastName(@Param("name") String name);
+	List<VotingSession> findByName(@Param("name") String name);
 
 }
