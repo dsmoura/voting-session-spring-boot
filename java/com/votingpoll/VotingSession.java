@@ -2,45 +2,41 @@ package com.votingpoll;
 
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document("votingsession")
 public class VotingSession {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private Integer id;
 
-	private String name;
-	
-	private Date createdDate = new Date();
-	
+	private String topicName;
+	private Date openSessionDate;
 	private Integer minutesDuration;
 	
-	private Integer yesVotesTotal = 0;
+	public VotingSession(Integer id, String topicName) {
+		this.id = id;
+		this.topicName = topicName;
+	}
 	
-	private Integer noVotesTotal = 0;
-	
-	public long getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getName() {
-		return name;
+	public String getTopicName() {
+		return topicName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
 	}
-	public Date getCreatedDate() {
-		return createdDate;
+	public Date getOpenSessionDate() {
+		return openSessionDate;
 	}
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
+	public void setOpenSessionDate(Date openSessionDate) {
+		this.openSessionDate = openSessionDate;
 	}
 	public Integer getMinutesDuration() {
 		return minutesDuration;
@@ -48,16 +44,11 @@ public class VotingSession {
 	public void setMinutesDuration(Integer minutesDuration) {
 		this.minutesDuration = minutesDuration;
 	}
-	public Integer getYesVotesTotal() {
-		return yesVotesTotal;
-	}
-	public void setYesVotesTotal(Integer yesVotesTotal) {
-		this.yesVotesTotal = yesVotesTotal;
-	}
-	public Integer getNoVotesTotal() {
-		return noVotesTotal;
-	}
-	public void setNoVotesTotal(Integer noVotesTotal) {
-		this.noVotesTotal = noVotesTotal;
+
+	public String toString() {
+		return this.id + " " +
+				this.topicName + " " + 
+				this.openSessionDate + " " +
+				this.minutesDuration;
 	}
 }

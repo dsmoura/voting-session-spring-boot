@@ -2,14 +2,17 @@ package com.votingpoll;
 
 import java.util.List;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
-@RepositoryRestResource(collectionResourceRel = "votingsession", path = "votingsession")
-public interface VotingSessionRepository extends PagingAndSortingRepository<VotingSession, Long>, CrudRepository<VotingSession,Long> {
+public interface VotingSessionRepository extends MongoRepository<VotingSession, String> {
 
-	List<VotingSession> findByName(@Param("name") String name);
+	@Query("{name:'?0'}")
+	VotingSession findByName(String name);
+
+	@Query(value = "{category:'?0'}", fields = "{'name' : 1, 'quantity' : 1}")
+	List<VotingSession> findAll(String category);
+
+	public long count();
 
 }
