@@ -2,7 +2,7 @@ package com.votingpoll;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("membervote")
+@Document("membervotedoc")
 public class MemberVote {
 
 	private Integer votingSessionId;

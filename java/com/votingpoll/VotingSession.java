@@ -5,19 +5,19 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document("votingsession")
+@Document("votingsessiondoc")
 public class VotingSession {
 
 	@Id
 	private Integer id;
 
-	private String topicName;
+	private String name;
 	private Date openSessionDate;
 	private Integer minutesDuration;
 	
-	public VotingSession(Integer id, String topicName) {
+	public VotingSession(Integer id, String name) {
 		this.id = id;
-		this.topicName = topicName;
+		this.name = name;
 	}
 	
 	public Integer getId() {
@@ -26,11 +26,11 @@ public class VotingSession {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getTopicName() {
-		return topicName;
+	public String getName() {
+		return name;
 	}
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
+	public void setName(String name) {
+		this.name = name;
 	}
 	public Date getOpenSessionDate() {
 		return openSessionDate;
@@ -47,7 +47,7 @@ public class VotingSession {
 
 	public String toString() {
 		return this.id + " " +
-				this.topicName + " " + 
+				this.name + " " + 
 				this.openSessionDate + " " +
 				this.minutesDuration;
 	}
