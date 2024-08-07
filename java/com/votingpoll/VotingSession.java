@@ -12,8 +12,8 @@ public class VotingSession {
 	private Integer id;
 
 	private String name;
-	private Date openSessionDate;
-	private Integer minutesDuration;
+	private Date startDate;
+	private Integer minutes;
 	
 	public VotingSession(Integer id, String name) {
 		this.id = id;
@@ -32,23 +32,22 @@ public class VotingSession {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Date getOpenSessionDate() {
-		return openSessionDate;
+	public Date getStartDate() {
+		return startDate;
 	}
-	public void setOpenSessionDate(Date openSessionDate) {
-		this.openSessionDate = openSessionDate;
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
-	public Integer getMinutesDuration() {
-		return minutesDuration;
+	public Integer getMinutes() {
+		return minutes;
 	}
-	public void setMinutesDuration(Integer minutesDuration) {
-		this.minutesDuration = minutesDuration;
+	public void setMinutes(Integer minutes) {
+		this.minutes = minutes;
 	}
-
 	public String toString() {
 		return this.id + " " +
 				this.name + " " + 
-				this.openSessionDate + " " +
-				this.minutesDuration;
+				this.startDate + " " +
+				this.minutes;
 	}
 }
