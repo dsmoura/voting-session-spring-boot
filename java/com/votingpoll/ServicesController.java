@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.votingpoll.dto.MemberVote;
+import com.votingpoll.dto.VotingSession;
+import com.votingpoll.repository.MemberVoteRepository;
+import com.votingpoll.repository.VotingSessionRepository;
+
 @RestController
 public class ServicesController {
 	

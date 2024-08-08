@@ -1,4 +1,4 @@
-package com.votingpoll;
+package com.votingpoll.dto;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,4 +1,4 @@
-package com.votingpoll;
+package com.votingpoll.dto;
 
 import java.util.Date;
 
