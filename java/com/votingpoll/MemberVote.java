@@ -5,20 +5,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("membervotedoc")
 public class MemberVote {
 
-	private Integer votingSessionId;
+	private Long votingSessionId;
 	private Long memberId;
-	private Integer vote;
+	private String vote;
 	
-	public MemberVote(Integer votingSessionId, Long memberId, Integer vote) {
+	public MemberVote(Long votingSessionId, Long memberId, String vote) {
 		this.votingSessionId = votingSessionId;
 		this.memberId = memberId;
 		this.vote = vote;
 	}
 	
-	public Integer getVotingSessionId() {
+	public Long getVotingSessionId() {
 		return votingSessionId;
 	}
-	public void setVotingSessionId(Integer votingSessionId) {
+	public void setVotingSessionId(Long votingSessionId) {
 		this.votingSessionId = votingSessionId;
 	}
 	public Long getMemberId() {
@@ -27,10 +27,10 @@ public class MemberVote {
 	public void setMemberId(Long memberId) {
 		this.memberId = memberId;
 	}
-	public Integer getVote() {
+	public String getVote() {
 		return vote;
 	}
-	public void setVote(Integer vote) {
+	public void setVote(String vote) {
 		this.vote = vote;
 	}
 

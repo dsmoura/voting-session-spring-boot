@@ -21,10 +21,14 @@ public class VotingSessionAPIIntegrationTests {
 
 	@Autowired
 	private VotingSessionRepository votingSessionRepository;
+	
+	@Autowired
+	private MemberVoteRepository memberVoteRepository;
 
 	@BeforeEach
 	public void deleteAllBeforeTests() throws Exception {
 		votingSessionRepository.deleteAll();
+		memberVoteRepository.deleteAll();
 	}
 
 	@Test
@@ -35,7 +39,7 @@ public class VotingSessionAPIIntegrationTests {
 
 	@Test
 	public void shouldCreateNewVotingSession() throws Exception {
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":1, \"name\":\"name1\"}"))
 				.andExpect(status().isOk())
@@ -43,14 +47,14 @@ public class VotingSessionAPIIntegrationTests {
 	}
 	
 	@Test
-	public void shoudOpenVotingSession () throws Exception {
-		mockMvc.perform(post("/voting-sessions")
+	public void shoudOpenVotingSession() throws Exception {
+		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":2, \"name\":\"name2\"}"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value("name2"));
 		
-		mockMvc.perform(put("/voting-sessions")
+		mockMvc.perform(put("/sessions")
 				.param("id", "2")
 				.param("minutes", "30"))
 				.andExpect(status().isOk())
@@ -59,19 +63,46 @@ public class VotingSessionAPIIntegrationTests {
 	}
 	
 	@Test
-	public void shoudOpenVotingSessionWithOneMinuteDefaultDuration () throws Exception {
+	public void shoudOpenVotingSessionWithOneMinuteDefaultDurations() throws Exception {
 		final int defaultDuration = 1;
 		
-		mockMvc.perform(post("/voting-sessions")
+		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":3, \"name\":\"name3\"}"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name").value("name3"));
 		
-		mockMvc.perform(put("/voting-sessions")
+		mockMvc.perform(put("/sessions")
 				.param("id", "3"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value("3"))
 				.andExpect(jsonPath("$.minutes").value(defaultDuration));
+	}
+	
+	@Test
+	public void shouldVoteOnSession() throws Exception {
+		mockMvc.perform(post("/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":7, \"name\":\"name7\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name").value("name7"));
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "7")
+				.param("memberId", "10")
+				.param("vote", "YES"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "7")
+				.param("memberId", "11")
+				.param("vote", "YES"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "7")
+				.param("memberId", "12")
+				.param("vote", "NO"))
+				.andExpect(status().isCreated());
 	}
 }

@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,24 +21,27 @@ public class VotingSessionController {
 
 	@Autowired
 	private VotingSessionRepository votingSessionRepository;
+	
+	@Autowired
+	private MemberVoteRepository memberVoteRepository;
 
 	@GetMapping("/")
 	String hello() {
 		return "Hellow";
 	}
 
-	@GetMapping("/voting-sessions")
-	Optional<VotingSession> findVotingSession(@RequestParam Integer id) {
+	@GetMapping("/sessions")
+	Optional<VotingSession> findVotingSession(@RequestParam Long id) {
 		return votingSessionRepository.findById(id);
 	}
 
-	@PostMapping("/voting-sessions")
+	@PostMapping("/sessions")
 	VotingSession newVotingSession(@RequestBody VotingSession votingSession) {
 		return votingSessionRepository.save(votingSession);
 	}
 
-	@PutMapping("/voting-sessions")
-	VotingSession startVotingSession(@RequestParam Integer id,
+	@PutMapping("/sessions")
+	VotingSession startVotingSession(@RequestParam Long id,
 										@RequestParam(required = false) Integer minutes) {
 		return votingSessionRepository.findById(id).map(votingSession -> {
 			votingSession.setMinutes(minutes==null ? DEFAULT_MINUTES_DURATION : minutes);
@@ -46,6 +50,23 @@ public class VotingSessionController {
 		}).orElseGet(() -> {
 			return null;
 		});
+	}
+	
+	@PostMapping("/vote")
+	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
+													@RequestParam Long memberId,
+													@RequestParam String vote) {
+		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
+		if (memberVotes.size() > 0) {
+			return new ResponseEntity<MemberVote>(HttpStatus.NOT_ACCEPTABLE);
+		}
+		if (!vote.equals("NO") && !vote.equals("YES")) {
+			System.out.println(memberVotes);
+			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
+		}
+		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, vote));
+		
+		return new ResponseEntity<MemberVote>(HttpStatus.CREATED);
 	}
 
 }
