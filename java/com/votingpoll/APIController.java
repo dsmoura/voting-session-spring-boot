@@ -2,7 +2,6 @@ package com.votingpoll;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class VotingSessionController {
+public class APIController {
 	
 	public final static Integer DEFAULT_MINUTES_DURATION = 1;
 
@@ -28,11 +27,6 @@ public class VotingSessionController {
 	@GetMapping("/")
 	String hello() {
 		return "Hellow";
-	}
-
-	@GetMapping("/sessions")
-	Optional<VotingSession> findVotingSession(@RequestParam Long id) {
-		return votingSessionRepository.findById(id);
 	}
 
 	@PostMapping("/sessions")
@@ -67,6 +61,11 @@ public class VotingSessionController {
 		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, vote));
 		
 		return new ResponseEntity<MemberVote>(HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/sessions")
+	VotingSession findVotingSession(@RequestParam Long id) {
+		return votingSessionRepository.findById(id).get();
 	}
 
 }

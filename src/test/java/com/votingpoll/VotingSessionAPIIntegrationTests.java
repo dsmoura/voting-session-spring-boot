@@ -95,14 +95,29 @@ public class VotingSessionAPIIntegrationTests {
 		
 		mockMvc.perform(post("/vote")
 				.param("votingSessionId", "7")
-				.param("memberId", "11")
-				.param("vote", "YES"))
-				.andExpect(status().isCreated());
-		
-		mockMvc.perform(post("/vote")
-				.param("votingSessionId", "7")
 				.param("memberId", "12")
 				.param("vote", "NO"))
 				.andExpect(status().isCreated());
 	}
+	
+	@Test
+	public void shouldNotVoteTwiceOnSameSession() throws Exception {
+		mockMvc.perform(post("/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":8, \"name\":\"name8\"}"))
+				.andExpect(status().isOk());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "8")
+				.param("memberId", "20")
+				.param("vote", "YES"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "8")
+				.param("memberId", "20")
+				.param("vote", "YES"))
+				.andExpect(status().isNotAcceptable());
+	}
+	
 }
