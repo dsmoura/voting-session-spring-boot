@@ -9,5 +9,8 @@ public interface MemberVoteRepository extends MongoRepository<MemberVote, Long> 
 
 	List<MemberVote> findByVotingSessionIdAndMemberId
 						(@Param("votingSessionId") Long votingSessionId,
-						@Param("memberId")Long memberId);
+								@Param("memberId") Long memberId);
+	
+	Long countByVotingSessionIdAndVote(@Param("votingSessionId") Long votingSessionId,
+							@Param("vote") String vote);
 }

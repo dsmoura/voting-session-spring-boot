@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class APIController {
+public class ServicesController {
 	
 	public final static Integer DEFAULT_MINUTES_DURATION = 1;
 
@@ -55,7 +55,6 @@ public class APIController {
 			return new ResponseEntity<MemberVote>(HttpStatus.NOT_ACCEPTABLE);
 		}
 		if (!vote.equals("NO") && !vote.equals("YES")) {
-			System.out.println(memberVotes);
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
 		}
 		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, vote));
@@ -64,8 +63,17 @@ public class APIController {
 	}
 	
 	@GetMapping("/sessions")
-	VotingSession findVotingSession(@RequestParam Long id) {
-		return votingSessionRepository.findById(id).get();
+	ResponseEntity<VotingSession> countSessionTotalVotes(@RequestParam Long id) {
+		VotingSession votingSession = votingSessionRepository.findById(id).get();
+		if (votingSession == null) {
+			return new ResponseEntity<VotingSession>(HttpStatus.BAD_REQUEST);
+		}
+		Long totalYes = memberVoteRepository.countByVotingSessionIdAndVote(id, "YES");
+		Long totalNo = memberVoteRepository.countByVotingSessionIdAndVote(id, "NO");
+		votingSession.setYesTotalVotes(totalYes);
+		votingSession.setNoTotalVotes(totalNo);
+		
+		return ResponseEntity.ok(votingSession);
 	}
 
 }

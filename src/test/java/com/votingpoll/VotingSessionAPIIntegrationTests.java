@@ -120,4 +120,35 @@ public class VotingSessionAPIIntegrationTests {
 				.andExpect(status().isNotAcceptable());
 	}
 	
+	@Test
+	public void shouldCountTotalVotesOnSession() throws Exception {
+		mockMvc.perform(post("/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":55, \"name\":\"name55\"}"))
+				.andExpect(status().isOk());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "55")
+				.param("memberId", "20")
+				.param("vote", "YES"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "55")
+				.param("memberId", "21")
+				.param("vote", "YES"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(post("/vote")
+				.param("votingSessionId", "55")
+				.param("memberId", "22")
+				.param("vote", "NO"))
+				.andExpect(status().isCreated());
+		
+		mockMvc.perform(get("/sessions")
+				.param("id", "55"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.yesTotalVotes").value("2"))
+				.andExpect(jsonPath("$.noTotalVotes").value("1"));
+	}
 }
