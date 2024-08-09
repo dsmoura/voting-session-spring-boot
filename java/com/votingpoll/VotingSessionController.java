@@ -2,6 +2,7 @@ package com.votingpoll;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,10 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.votingpoll.dto.MemberVote;
 import com.votingpoll.dto.VotingSession;
@@ -32,24 +34,23 @@ public class VotingSessionController {
 
 	@GetMapping("/")
 	String hello() {
-		return "Hellow";
+		return "Hello. It's the Voting Session Application here.";
 	}
 
 	@PostMapping("/sessions")
-	VotingSession newVotingSession(@RequestBody VotingSession votingSession) {
+	@ResponseStatus(HttpStatus.CREATED)
+	VotingSession saveVotingSession(@RequestBody VotingSession votingSession) {
+		Optional<VotingSession> vs = votingSessionRepository.findById(votingSession.getId());
+		if (vs.isPresent()) {
+			if (vs.get().getMinutes() == null) {
+				if (votingSession.getMinutes() == null) {
+					votingSession.setMinutes(DEFAULT_MINUTES_DURATION);
+				}
+				votingSession.setStartDate(new Date());
+				return votingSessionRepository.save(votingSession);
+			}
+		}
 		return votingSessionRepository.save(votingSession);
-	}
-
-	@PutMapping("/sessions")
-	VotingSession startVotingSession(@RequestParam Long id,
-										@RequestParam(required = false) Integer minutes) {
-		return votingSessionRepository.findById(id).map(votingSession -> {
-			votingSession.setMinutes(minutes==null ? DEFAULT_MINUTES_DURATION : minutes);
-			votingSession.setStartDate(new Date());
-			return votingSessionRepository.save(votingSession);
-		}).orElseGet(() -> {
-			return null;
-		});
 	}
 	
 	@PostMapping("/vote")
@@ -65,7 +66,11 @@ public class VotingSessionController {
 		}
 		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, vote));
 		
-		return new ResponseEntity<MemberVote>(HttpStatus.CREATED);
+		return ResponseEntity.created(ServletUriComponentsBuilder
+			    						.fromCurrentRequestUri()
+			    							.path("/{id}")
+			    							.buildAndExpand(votingSessionId).toUri())
+			    							.build();
 	}
 	
 	@GetMapping("/sessions/{id}")

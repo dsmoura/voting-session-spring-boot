@@ -53,7 +53,7 @@ public class PerformanceTests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":" + id + ", \"name\":\"name6000\"}"))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 
 		logger.info("Simulating " + loadTimesYes + " YES votes on the session " + id + ": START");

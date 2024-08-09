@@ -14,6 +14,7 @@ import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -48,7 +49,7 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":1, \"name\":\"name1\"}"))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name1"));
 	}
 	
@@ -57,13 +58,13 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":2, \"name\":\"name2\"}"))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name2"));
 		
-		mockMvc.perform(put("/sessions")
-				.param("id", "2")
-				.param("minutes", "30"))
-				.andExpect(status().isOk())
+		mockMvc.perform(post("/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":2, \"minutes\":\"30\"}"))
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value("2"))
 				.andExpect(jsonPath("$.minutes").value("30"));
 	}
@@ -75,12 +76,13 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":3, \"name\":\"name3\"}"))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name3"));
 		
-		mockMvc.perform(put("/sessions")
-				.param("id", "3"))
-				.andExpect(status().isOk())
+		mockMvc.perform(post("/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":3}"))
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value("3"))
 				.andExpect(jsonPath("$.minutes").value(defaultDuration));
 	}
@@ -90,7 +92,7 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":7, \"name\":\"name7\"}"))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name7"));
 		
 		mockMvc.perform(post("/vote")
@@ -103,7 +105,8 @@ public class VotingSessionAPITests {
 				.param("votingSessionId", "7")
 				.param("memberId", "12")
 				.param("vote", "NO"))
-				.andExpect(status().isCreated());
+				.andExpect(status().isCreated())
+				.andDo(print());
 	}
 	
 	@Test
@@ -111,7 +114,7 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":8, \"name\":\"name8\"}"))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/vote")
 				.param("votingSessionId", "8")
@@ -132,7 +135,7 @@ public class VotingSessionAPITests {
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":" + id + ", \"name\":\"name55\"}"))
-				.andExpect(status().isOk());
+				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/vote")
 				.param("votingSessionId", id)
