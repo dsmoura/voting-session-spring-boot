@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +20,7 @@ import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
 
 @RestController
-public class ServicesController {
+public class VotingSessionController {
 	
 	public final static Integer DEFAULT_MINUTES_DURATION = 1;
 
@@ -67,8 +68,8 @@ public class ServicesController {
 		return new ResponseEntity<MemberVote>(HttpStatus.CREATED);
 	}
 	
-	@GetMapping("/sessions")
-	ResponseEntity<VotingSession> countSessionTotalVotes(@RequestParam Long id) {
+	@GetMapping("/sessions/{id}")
+	ResponseEntity<VotingSession> countSessionTotalVotes(@PathVariable Long id) {
 		VotingSession votingSession = votingSessionRepository.findById(id).get();
 		if (votingSession == null) {
 			return new ResponseEntity<VotingSession>(HttpStatus.BAD_REQUEST);

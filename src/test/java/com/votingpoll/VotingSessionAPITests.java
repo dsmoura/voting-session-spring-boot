@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class VotingSessionAPIIntegrationTests {
+public class VotingSessionAPITests {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -29,7 +29,7 @@ public class VotingSessionAPIIntegrationTests {
 	@Autowired
 	private MemberVoteRepository memberVoteRepository;
 	
-	Logger logger = LoggerFactory.getLogger(VotingSessionAPIIntegrationTests.class);
+	Logger logger = LoggerFactory.getLogger(VotingSessionAPITests.class);
 
 	@BeforeEach
 	public void deleteAllBeforeTests() throws Exception {
@@ -128,31 +128,31 @@ public class VotingSessionAPIIntegrationTests {
 	
 	@Test
 	public void shouldCountTotalVotesOnSession() throws Exception {
+		String id = "55";
 		mockMvc.perform(post("/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"id\":55, \"name\":\"name55\"}"))
+				.content("{\"id\":" + id + ", \"name\":\"name55\"}"))
 				.andExpect(status().isOk());
 		
 		mockMvc.perform(post("/vote")
-				.param("votingSessionId", "55")
+				.param("votingSessionId", id)
 				.param("memberId", "20")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/vote")
-				.param("votingSessionId", "55")
+				.param("votingSessionId", id)
 				.param("memberId", "21")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/vote")
-				.param("votingSessionId", "55")
+				.param("votingSessionId", id)
 				.param("memberId", "22")
 				.param("vote", "NO"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(get("/sessions")
-				.param("id", "55"))
+		mockMvc.perform(get("/sessions/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.yesTotalVotes").value("2"))
 				.andExpect(jsonPath("$.noTotalVotes").value("1"));

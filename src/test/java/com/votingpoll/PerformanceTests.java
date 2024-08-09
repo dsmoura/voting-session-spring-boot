@@ -2,6 +2,7 @@ package com.votingpoll;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import com.votingpoll.repository.VotingSessionRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +41,8 @@ public class PerformanceTests {
 	}
 
 	@Test
-	public void shouldVoteManyTimesOnSession() throws Exception {
+	@Timeout(value=10, unit=TimeUnit.SECONDS)
+	public void shouldVote2001TimesOnSessionInTenSeconds() throws Exception {
 		String id = "6000";
 		
 		int loadTimesYes = 1001;
@@ -75,8 +79,7 @@ public class PerformanceTests {
 		
 		logger.info("Simulating " + loadTimesNo + " NO votes on the session " + id + ": FINISH");
 		
-		mockMvc.perform(get("/sessions")
-				.param("id", id))
+		mockMvc.perform(get("/sessions/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.yesTotalVotes").value(loadTimesYes))
 				.andExpect(jsonPath("$.noTotalVotes").value(loadTimesNo));

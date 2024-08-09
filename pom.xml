@@ -46,7 +46,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.votingpoll.MongoDBRunApplication.class</mainClass>
+							<mainClass>com.votingpoll.VotingSessionServicesApplication.class</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

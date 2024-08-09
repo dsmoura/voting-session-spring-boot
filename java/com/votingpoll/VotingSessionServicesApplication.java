@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MongoDBRunApplication {
+public class VotingSessionServicesApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MongoDBRunApplication.class, args);
+		SpringApplication.run(VotingSessionServicesApplication.class, args);
 	}
 }
