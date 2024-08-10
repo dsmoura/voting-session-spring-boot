@@ -16,3 +16,8 @@ Load Tests runned -> 9999 tests on ~24s + 9998 tests in a row on ~49s.
 2024-08-08T20:16:59.894-03:00  INFO 15096 --- [           main] c.v.VotingSessionAPIIntegrationTests     : Simulating 9999 YES votes on the session 6000: FINISH
 2024-08-08T20:16:59.895-03:00  INFO 15096 --- [           main] c.v.VotingSessionAPIIntegrationTests     : Simulating 9998 NO votes on the session 6000: START
 2024-08-08T20:17:48.864-03:00  INFO 15096 --- [           main] c.v.VotingSessionAPIIntegrationTests     : Simulating 9998 NO votes on the session 6000: FINISH
+
+Random generated valid CPFs to test.
+User API will deny vote on sessions for odd number CPFs.
+"22026073074" ABLE_TO_VOTE (even number)
+"28305251837" UNABLE_TO_VOTE (odd number)

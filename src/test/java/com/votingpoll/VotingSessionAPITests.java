@@ -160,4 +160,31 @@ public class VotingSessionAPITests {
 				.andExpect(jsonPath("$.yesTotalVotes").value("2"))
 				.andExpect(jsonPath("$.noTotalVotes").value("1"));
 	}
+	
+	@Test
+	public void shouldReturnAbleToVoteWithValidCPF() throws Exception {
+		String cpf = "22026073074";
+		mockMvc.perform(get("/users/" + cpf))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.cpf").value(cpf))
+				.andExpect(jsonPath("$.ableToVoteStatus").value("ABLE_TO_VOTE"));
+	}
+	
+	@Test
+	public void shouldReturnUnableToVoteWithOddNumberValidCPF() throws Exception {
+		String cpf = "28305251837";
+		mockMvc.perform(get("/users/" + cpf))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.cpf").value(cpf))
+				.andExpect(jsonPath("$.ableToVoteStatus").value("UNABLE_TO_VOTE"));
+	}
+	
+	@Test
+	public void shouldReturnUnableToVoteWithInvalidCPF() throws Exception {
+		String cpf = "49062342088";
+		mockMvc.perform(get("/users/" + cpf))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.cpf").value(cpf))
+				.andExpect(jsonPath("$.ableToVoteStatus").value("UNABLE_TO_VOTE"));
+	}
 }
