@@ -166,8 +166,7 @@ public class VotingSessionAPITests {
 		String cpf = "22026073074";
 		mockMvc.perform(get("/users/" + cpf))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.cpf").value(cpf))
-				.andExpect(jsonPath("$.ableToVoteStatus").value("ABLE_TO_VOTE"));
+				.andExpect(jsonPath("$.status").value("ABLE_TO_VOTE"));
 	}
 	
 	@Test
@@ -175,8 +174,7 @@ public class VotingSessionAPITests {
 		String cpf = "28305251837";
 		mockMvc.perform(get("/users/" + cpf))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.cpf").value(cpf))
-				.andExpect(jsonPath("$.ableToVoteStatus").value("UNABLE_TO_VOTE"));
+				.andExpect(jsonPath("$.status").value("UNABLE_TO_VOTE"));
 	}
 	
 	@Test
