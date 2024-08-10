@@ -15,7 +15,7 @@ public class UserController {
 	public final static String ABLE_TO_VOTE = "ABLE_TO_VOTE";
 	public final static String UNABLE_TO_VOTE = "UNABLE_TO_VOTE";
 
-	@GetMapping("/users/{cpf}")
+	@GetMapping("/v1/users/{cpf}")
 	ResponseEntity<String> validateUserToVote(@PathVariable String cpf) {
 		if (!CpfValidator.isValidCPF(cpf)) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);

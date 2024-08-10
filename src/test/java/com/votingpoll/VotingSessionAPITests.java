@@ -46,7 +46,7 @@ public class VotingSessionAPITests {
 
 	@Test
 	public void shouldCreateNewVotingSession() throws Exception {
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":1, \"name\":\"name1\"}"))
 				.andExpect(status().isCreated())
@@ -55,13 +55,13 @@ public class VotingSessionAPITests {
 	
 	@Test
 	public void shoudOpenVotingSession() throws Exception {
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":2, \"name\":\"name2\"}"))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name2"));
 		
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":2, \"minutes\":\"30\"}"))
 				.andExpect(status().isCreated())
@@ -73,13 +73,13 @@ public class VotingSessionAPITests {
 	public void shoudOpenVotingSessionWithOneMinuteDefaultDurations() throws Exception {
 		final int defaultDuration = 1;
 		
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":3, \"name\":\"name3\"}"))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name3"));
 		
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":3}"))
 				.andExpect(status().isCreated())
@@ -89,19 +89,19 @@ public class VotingSessionAPITests {
 	
 	@Test
 	public void shouldVoteOnSession() throws Exception {
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":7, \"name\":\"name7\"}"))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name7"));
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
 				.param("memberId", "10")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
 				.param("memberId", "12")
 				.param("vote", "NO"))
@@ -111,18 +111,18 @@ public class VotingSessionAPITests {
 	
 	@Test
 	public void shouldNotVoteTwiceOnSameSession() throws Exception {
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":8, \"name\":\"name8\"}"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
 				.param("memberId", "20")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
 				.param("memberId", "20")
 				.param("vote", "YES"))
@@ -132,30 +132,30 @@ public class VotingSessionAPITests {
 	@Test
 	public void shouldCountTotalVotesOnSession() throws Exception {
 		String id = "55";
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":" + id + ", \"name\":\"name55\"}"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "20")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "21")
 				.param("vote", "YES"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(post("/vote")
+		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "22")
 				.param("vote", "NO"))
 				.andExpect(status().isCreated());
 		
-		mockMvc.perform(get("/sessions/" + id))
+		mockMvc.perform(get("/v1/sessions/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.yesTotalVotes").value("2"))
 				.andExpect(jsonPath("$.noTotalVotes").value("1"));
@@ -164,7 +164,7 @@ public class VotingSessionAPITests {
 	@Test
 	public void shouldReturnAbleToVoteWithValidCPF() throws Exception {
 		String cpf = "22026073074";
-		mockMvc.perform(get("/users/" + cpf))
+		mockMvc.perform(get("/v1/users/" + cpf))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").value("ABLE_TO_VOTE"));
 	}
@@ -172,7 +172,7 @@ public class VotingSessionAPITests {
 	@Test
 	public void shouldReturnUnableToVoteWithOddNumberValidCPF() throws Exception {
 		String cpf = "28305251837";
-		mockMvc.perform(get("/users/" + cpf))
+		mockMvc.perform(get("/v1/users/" + cpf))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").value("UNABLE_TO_VOTE"));
 	}
@@ -180,7 +180,7 @@ public class VotingSessionAPITests {
 	@Test
 	public void shouldReturnUnableToVoteWithInvalidCPF() throws Exception {
 		String cpf = "49062342088";
-		mockMvc.perform(get("/users/" + cpf))
+		mockMvc.perform(get("/v1/users/" + cpf))
 				.andExpect(status().isNotFound());
 	}
 }

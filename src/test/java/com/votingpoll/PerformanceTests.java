@@ -50,7 +50,7 @@ public class PerformanceTests {
 		
 		logger.info("Voting on the session " + id);
 		
-		mockMvc.perform(post("/sessions")
+		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"id\":" + id + ", \"name\":\"name6000\"}"))
 				.andExpect(status().isCreated());
@@ -59,7 +59,7 @@ public class PerformanceTests {
 		logger.info("Simulating " + loadTimesYes + " YES votes on the session " + id + ": START");
 		
 		for (int i = 0; i < loadTimesYes; i++) {
-			mockMvc.perform(post("/vote")
+			mockMvc.perform(post("/v1/vote")
 					.param("votingSessionId", id)
 					.param("memberId", "2000000"+i)
 					.param("vote", "YES"))
@@ -70,7 +70,7 @@ public class PerformanceTests {
 		logger.info("Simulating " + loadTimesNo + " NO votes on the session " + id + ": START");
 		
 		for (int i = 0; i < loadTimesNo; i++) {
-			mockMvc.perform(post("/vote")
+			mockMvc.perform(post("/v1/vote")
 					.param("votingSessionId", id)
 					.param("memberId", "10000000"+i)
 					.param("vote", "NO"))
@@ -79,7 +79,7 @@ public class PerformanceTests {
 		
 		logger.info("Simulating " + loadTimesNo + " NO votes on the session " + id + ": FINISH");
 		
-		mockMvc.perform(get("/sessions/" + id))
+		mockMvc.perform(get("/v1/sessions/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.yesTotalVotes").value(loadTimesYes))
 				.andExpect(jsonPath("$.noTotalVotes").value(loadTimesNo));

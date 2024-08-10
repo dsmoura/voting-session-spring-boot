@@ -37,7 +37,7 @@ public class VotingSessionController {
 		return "Hello. It's the Voting Session Application here.";
 	}
 
-	@PostMapping("/sessions")
+	@PostMapping("/v1/sessions")
 	@ResponseStatus(HttpStatus.CREATED)
 	VotingSession saveVotingSession(@RequestBody VotingSession votingSession) {
 		Optional<VotingSession> vs = votingSessionRepository.findById(votingSession.getId());
@@ -53,7 +53,7 @@ public class VotingSessionController {
 		return votingSessionRepository.save(votingSession);
 	}
 	
-	@PostMapping("/vote")
+	@PostMapping("/v1/vote")
 	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
 													@RequestParam Long memberId,
 													@RequestParam String vote) {
@@ -73,7 +73,7 @@ public class VotingSessionController {
 			    							.build();
 	}
 	
-	@GetMapping("/sessions/{id}")
+	@GetMapping("/v1/sessions/{id}")
 	ResponseEntity<VotingSession> countSessionTotalVotes(@PathVariable Long id) {
 		VotingSession votingSession = votingSessionRepository.findById(id).get();
 		if (votingSession == null) {
