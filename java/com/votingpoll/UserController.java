@@ -1,5 +1,6 @@
 package com.votingpoll;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,10 @@ public class UserController {
 	ResponseEntity<User> validateUserToVote(@PathVariable String cpf) {
 		User user = new User();
 		user.setCpf(cpf);
-		if (CpfValidator.isValidCPF(cpf)
-				&& ((int) cpf.toCharArray()[10] % 2 == 0)) {
+		if (!CpfValidator.isValidCPF(cpf)) {
+			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+		}
+		if ((int) cpf.toCharArray()[10] % 2 == 0) {
 			user.setAbleToVoteStatus(ABLE_TO_VOTE);
 		} else {
 			user.setAbleToVoteStatus(UNABLE_TO_VOTE);

@@ -183,8 +183,6 @@ public class VotingSessionAPITests {
 	public void shouldReturnUnableToVoteWithInvalidCPF() throws Exception {
 		String cpf = "49062342088";
 		mockMvc.perform(get("/users/" + cpf))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.cpf").value(cpf))
-				.andExpect(jsonPath("$.ableToVoteStatus").value("UNABLE_TO_VOTE"));
+				.andExpect(status().isNotFound());
 	}
 }
