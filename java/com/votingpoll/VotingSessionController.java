@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.votingpoll.dto.MemberVote;
@@ -42,15 +43,23 @@ public class VotingSessionController {
 	VotingSession saveVotingSession(@RequestBody VotingSession votingSession) {
 		Optional<VotingSession> vs = votingSessionRepository.findById(votingSession.getId());
 		if (vs.isPresent()) {
-			if (vs.get().getMinutes() == null) {
-				if (votingSession.getMinutes() == null) {
+			//start voting session
+			boolean shallCreateVotingSession = vs.get().getMinutes() == null;
+			if (shallCreateVotingSession) {
+				boolean shallSetDefaultDuration = votingSession.getMinutes() == null;
+				if (shallSetDefaultDuration) {
 					votingSession.setMinutes(DEFAULT_MINUTES_DURATION);
 				}
 				votingSession.setStartDate(new Date());
 				return votingSessionRepository.save(votingSession);
 			}
 		}
-		return votingSessionRepository.save(votingSession);
+		else {
+			//create new voting session
+			return votingSessionRepository.save(votingSession);
+		}
+		//voting session already started
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voting session already started.");
 	}
 	
 	@PostMapping("/v1/vote")
@@ -75,10 +84,10 @@ public class VotingSessionController {
 	
 	@GetMapping("/v1/sessions/{id}")
 	ResponseEntity<VotingSession> countSessionTotalVotes(@PathVariable Long id) {
-		VotingSession votingSession = votingSessionRepository.findById(id).get();
-		if (votingSession == null) {
+		if (! votingSessionRepository.existsById(id)) {
 			return new ResponseEntity<VotingSession>(HttpStatus.BAD_REQUEST);
 		}
+		VotingSession votingSession = votingSessionRepository.findById(id).get();
 		Long totalYes = memberVoteRepository.countByVotingSessionIdAndVote(id, "YES");
 		Long totalNo = memberVoteRepository.countByVotingSessionIdAndVote(id, "NO");
 		votingSession.setYesTotalVotes(totalYes);

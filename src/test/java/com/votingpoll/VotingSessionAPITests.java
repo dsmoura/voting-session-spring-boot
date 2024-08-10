@@ -14,7 +14,6 @@ import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -54,6 +53,14 @@ public class VotingSessionAPITests {
 	}
 	
 	@Test
+	public void shouldNotCreateNewVotingSessionWithNoName() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":1"))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void shoudOpenVotingSession() throws Exception {
 		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -67,6 +74,27 @@ public class VotingSessionAPITests {
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value("2"))
 				.andExpect(jsonPath("$.minutes").value("30"));
+	}
+	
+	@Test
+	public void shoudNotOpenVotingSessionTwice() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":333, \"name\":\"name333\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.name").value("name333"));
+		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":333, \"minutes\":\"303\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value("333"))
+				.andExpect(jsonPath("$.minutes").value("303"));
+		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":333, \"minutes\":\"304\"}"))
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -105,8 +133,7 @@ public class VotingSessionAPITests {
 				.param("votingSessionId", "7")
 				.param("memberId", "12")
 				.param("vote", "NO"))
-				.andExpect(status().isCreated())
-				.andDo(print());
+				.andExpect(status().isCreated());
 	}
 	
 	@Test
