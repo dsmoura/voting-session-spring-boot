@@ -30,7 +30,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class VotingSessionController {
 	
 	public final static Integer DEFAULT_MINUTES_DURATION = 1;
-
+	private static final String NO_VOTE = "NO";
+	private static final String YES_VOTE = "YES";
+	
 	@Autowired
 	private VotingSessionRepository votingSessionRepository;
 	
@@ -71,18 +73,21 @@ public class VotingSessionController {
 		return votingSessionRepository.save(votingSession);
 	}
 	
+	@Operation(summary = "Vote on an existing session.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Vote with success."),
+							@ApiResponse(responseCode = "404", description = "Member has already voted on this session, or is trying to vote something different than YES or NO.")})
 	@PostMapping("/v1/vote")
 	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
 													@RequestParam Long memberId,
-													@RequestParam String vote) {
+													@RequestParam String voteYesOrNo) {
 		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
 		if (memberVotes.size() > 0) {
-			return new ResponseEntity<MemberVote>(HttpStatus.NOT_ACCEPTABLE);
-		}
-		if (!vote.equals("NO") && !vote.equals("YES")) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
 		}
-		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, vote));
+		if (!voteYesOrNo.equals(YES_VOTE) && !voteYesOrNo.equals(NO_VOTE)) {
+			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
+		}
+		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, voteYesOrNo));
 		
 		return ResponseEntity.created(ServletUriComponentsBuilder
 			    						.fromCurrentRequestUri()
@@ -100,8 +105,8 @@ public class VotingSessionController {
 			return new ResponseEntity<VotingSession>(HttpStatus.BAD_REQUEST);
 		}
 		VotingSession votingSession = votingSessionRepository.findById(id).get();
-		Long totalYes = memberVoteRepository.countByVotingSessionIdAndVote(id, "YES");
-		Long totalNo = memberVoteRepository.countByVotingSessionIdAndVote(id, "NO");
+		Long totalYes = memberVoteRepository.countByVotingSessionIdAndVote(id, YES_VOTE);
+		Long totalNo = memberVoteRepository.countByVotingSessionIdAndVote(id, NO_VOTE);
 		votingSession.setYesTotalVotes(totalYes);
 		votingSession.setNoTotalVotes(totalNo);
 		

@@ -1,6 +1,9 @@
 # Voting Session Spring Boot RESTFul API Application
 Be welcome :-)
 
+### Swagger OpenAPI Documentation
+Please check out the API Documentation on {URL}:{PORT}/swagger.
+
 ### NoSQL MongoDB
 Adopting One-to-Squillions Schema
 Voting Session -> Many Votes
