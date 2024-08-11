@@ -55,6 +55,12 @@ public class PerformanceTests {
 				.content("{\"id\":" + id + ", \"name\":\"name6000\"}"))
 				.andExpect(status().isCreated());
 		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":" + id + ", \"minutes\":\"45\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value(id))
+				.andExpect(jsonPath("$.minutes").value("45"));
 
 		logger.info("Simulating " + loadTimesYes + " YES votes on the session " + id + ": START");
 		
@@ -62,7 +68,7 @@ public class PerformanceTests {
 			mockMvc.perform(post("/v1/vote")
 					.param("votingSessionId", id)
 					.param("memberId", "2000000"+i)
-					.param("vote", "YES"))
+					.param("voteYesOrNo", "YES"))
 					.andExpect(status().isCreated());
 		}
 		
@@ -73,7 +79,7 @@ public class PerformanceTests {
 			mockMvc.perform(post("/v1/vote")
 					.param("votingSessionId", id)
 					.param("memberId", "10000000"+i)
-					.param("vote", "NO"))
+					.param("voteYesOrNo", "NO"))
 					.andExpect(status().isCreated());
 		}
 		

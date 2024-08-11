@@ -80,6 +80,9 @@ public class VotingSessionController {
 	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
 													@RequestParam Long memberId,
 													@RequestParam String voteYesOrNo) {
+		if (votingSessionId == null) {
+			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
+		}
 		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
 		if (memberVotes.size() > 0) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);

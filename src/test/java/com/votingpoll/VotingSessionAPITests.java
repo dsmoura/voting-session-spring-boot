@@ -123,16 +123,38 @@ public class VotingSessionAPITests {
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name7"));
 		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":7, \"minutes\":\"60\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value("7"))
+				.andExpect(jsonPath("$.minutes").value("60"));
+		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
 				.param("memberId", "10")
-				.param("vote", "YES"))
+				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
 				.param("memberId", "12")
-				.param("vote", "NO"))
+				.param("voteYesOrNo", "NO"))
+				.andExpect(status().isCreated());
+	}
+	
+	@Test
+	public void shouldNotVoteOnNotStartedSession() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":444, \"name\":\"name444\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.name").value("name444"));
+		
+		mockMvc.perform(post("/v1/vote")
+				.param("votingSessionId", "444")
+				.param("memberId", "12")
+				.param("voteYesOrNo", "NO"))
 				.andExpect(status().isCreated());
 	}
 	
@@ -143,17 +165,24 @@ public class VotingSessionAPITests {
 				.content("{\"id\":8, \"name\":\"name8\"}"))
 				.andExpect(status().isCreated());
 		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":8, \"minutes\":\"45\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value("8"))
+				.andExpect(jsonPath("$.minutes").value("45"));
+		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
 				.param("memberId", "20")
-				.param("vote", "YES"))
+				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
 				.param("memberId", "20")
-				.param("vote", "YES"))
-				.andExpect(status().isNotAcceptable());
+				.param("voteYesOrNo", "NO"))
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test
@@ -164,22 +193,29 @@ public class VotingSessionAPITests {
 				.content("{\"id\":" + id + ", \"name\":\"name55\"}"))
 				.andExpect(status().isCreated());
 		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":" + id + ", \"minutes\":\"30\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value(id))
+				.andExpect(jsonPath("$.minutes").value("30"));
+		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "20")
-				.param("vote", "YES"))
+				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "21")
-				.param("vote", "YES"))
+				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
 				.param("memberId", "22")
-				.param("vote", "NO"))
+				.param("voteYesOrNo", "NO"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(get("/v1/sessions/" + id))
