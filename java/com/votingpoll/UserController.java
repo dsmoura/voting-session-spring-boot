@@ -27,8 +27,8 @@ public class UserController {
 		if (!CpfValidator.isValidCPF(cpf)) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
-		
-		if ((int) cpf.toCharArray()[10] % 2 == 0) {
+		boolean isCpfEvenNumber = (int) cpf.toCharArray()[10] % 2 == 0;
+		if (isCpfEvenNumber) {
 			return ResponseEntity.ok("{\"status\":\"" + ABLE_TO_VOTE + "\"}");
 		} else {
 			return ResponseEntity.ok("{\"status\":\"" + UNABLE_TO_VOTE + "\"}");

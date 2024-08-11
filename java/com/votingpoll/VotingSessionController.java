@@ -22,6 +22,10 @@ import com.votingpoll.dto.VotingSession;
 import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 public class VotingSessionController {
 	
@@ -33,11 +37,16 @@ public class VotingSessionController {
 	@Autowired
 	private MemberVoteRepository memberVoteRepository;
 
+	@Operation(summary = "Just to say hello.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Application running OK, thanks!")})
 	@GetMapping("/")
 	String hello() {
 		return "Hello. It's the Voting Session Application here.";
 	}
 
+	@Operation(summary = "Create a Voting Session informind ID and Name. Start a Voting Session informing an existing ID and duration in minutes. One minute duration default.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Voting Session created informing ID and Name. Voting Session starts when informing Duration in Minutes for a Voting Session already created."),
+							@ApiResponse(responseCode = "400", description = "Voting Session already started, sorry but we can update its information anymore.")})
 	@PostMapping("/v1/sessions")
 	@ResponseStatus(HttpStatus.CREATED)
 	VotingSession saveVotingSession(@RequestBody VotingSession votingSession) {
@@ -48,18 +57,18 @@ public class VotingSessionController {
 			if (shallCreateVotingSession) {
 				boolean shallSetDefaultDuration = votingSession.getMinutes() == null;
 				if (shallSetDefaultDuration) {
-					votingSession.setMinutes(DEFAULT_MINUTES_DURATION);
+					vs.get().setMinutes(DEFAULT_MINUTES_DURATION);
+				} else {
+					vs.get().setMinutes(votingSession.getMinutes());
 				}
-				votingSession.setStartDate(new Date());
-				return votingSessionRepository.save(votingSession);
+				vs.get().setStartDate(new Date());
+				return votingSessionRepository.save(vs.get());
+			}
+			else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voting session already started.");
 			}
 		}
-		else {
-			//create new voting session
-			return votingSessionRepository.save(votingSession);
-		}
-		//voting session already started
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voting session already started.");
+		return votingSessionRepository.save(votingSession);
 	}
 	
 	@PostMapping("/v1/vote")
@@ -82,6 +91,9 @@ public class VotingSessionController {
 			    							.build();
 	}
 	
+	@Operation(summary = "Information data of an existing Voting Session.")
+	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Brings all information of a Voting Session, couting total votes."),
+							@ApiResponse(responseCode = "400", description = "Sorry, Voting Session ID doesn't exist.")})
 	@GetMapping("/v1/sessions/{id}")
 	ResponseEntity<VotingSession> countSessionTotalVotes(@PathVariable Long id) {
 		if (! votingSessionRepository.existsById(id)) {
