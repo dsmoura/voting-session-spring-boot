@@ -1,10 +1,17 @@
 # Voting Session Spring Boot RESTFul API Application
 Be welcome :-)
 
+### Please take a look at an example running on AWS EC2
+<http://18.230.24.159:8080/swagger>
+<http://ec2-18-230-24-159.sa-east-1.compute.amazonaws.com:8080/swagger>
+
 ### Swagger OpenAPI Documentation
 Please check out the API Documentation on {URL}:{PORT}/swagger.
 
 ### NoSQL MongoDB
+To run the application example, it's needed a Mongo DB instance running locally.
+
+### MongoDB Schema
 Adopting One-to-Squillions Schema
 Voting Session -> Many Votes
 According to the reference <https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design>
