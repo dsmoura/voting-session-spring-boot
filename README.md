@@ -2,8 +2,7 @@
 Be welcome :-)
 
 ### Please take a look at an example running on AWS EC2
-<http://18.230.24.159:8080/swagger>
-<http://ec2-18-230-24-159.sa-east-1.compute.amazonaws.com:8080/swagger>
+<http://54.207.40.174:8080/swagger>
 
 ### Swagger OpenAPI Documentation
 Please check out the API Documentation on {URL}:{PORT}/swagger.
