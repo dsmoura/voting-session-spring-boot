@@ -4,6 +4,9 @@ Be welcome :-)
 ### Please take a look at an example running on AWS EC2
 <http://54.207.40.174:8080/swagger>
 
+### Running this application
+Please clone this repository and run it on Maven command <code>mvn clean install</code>.
+
 ### Swagger OpenAPI Documentation
 Please check out the API Documentation on {URL}:{PORT}/swagger.
 
@@ -18,6 +21,7 @@ According to the reference <https://www.mongodb.com/blog/post/6-rules-of-thumb-f
 ### Test-first development
 All code was developed on TDD approach with Spring MVC Test framework - MockMvc.
 <https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html>
+To run the tests please use the Maven command <code>mvn test</code>
 
 ### Versioning
 All APIS started already on v1 version, through URI Path.
