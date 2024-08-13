@@ -5,7 +5,10 @@ Be welcome :-)
 <http://54.207.40.174:8080/swagger>
 
 ### Running this application
-Please clone this repository and run it on Maven command <code>mvn clean install</code>.
+1. Please clone this repository;
+2. Build it on Maven command <code>mvn clean install</code>.
+3. Run the application with the Maven command <code>mvn spring-boot:run</code>.
+4. Alternatively, run the built Jar with <code>java -jar voting-session-spring-boot.jar</code>.
 
 ### Swagger OpenAPI Documentation
 Please check out the API Documentation on {URL}:{PORT}/swagger.
