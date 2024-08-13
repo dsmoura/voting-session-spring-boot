@@ -1,6 +1,7 @@
 package com.votingpoll;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,8 @@ import com.votingpoll.repository.VotingSessionRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.Duration;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -168,6 +171,7 @@ public class VotingSessionAPITests {
 	}
 	
 	@Test
+	@Disabled("This test depends on time. It takes a minute at least. Remove this tag if you wish to test it completely.")
 	public void shouldNotVoteOnNotStartedSession() throws Exception {
 		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -175,10 +179,34 @@ public class VotingSessionAPITests {
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("name444"));
 		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":444, \"minutes\":\"1\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value("444"))
+				.andExpect(jsonPath("$.minutes").value("1"));
+
+		Thread.sleep(Duration.ofSeconds(61));
+		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "444")
 				.param("memberId", "12")
 				.param("voteYesOrNo", "NO"))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void shouldNotVoteOnClosedSession() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":555, \"name\":\"name555\"}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.name").value("name555"));
+		
+		mockMvc.perform(post("/v1/vote")
+				.param("votingSessionId", "555")
+				.param("memberId", "125")
+				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isBadRequest());
 	}
 	

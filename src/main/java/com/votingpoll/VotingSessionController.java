@@ -98,6 +98,11 @@ public class VotingSessionController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session hasn't started yet.");
 		}
 		
+		long endTime = vs.get().getStartDate().getTime() + (vs.get().getMinutes() * 60 * 1000);
+		if (endTime < new Date().getTime()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session has already closed.");
+		}
+		
 		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
 		boolean hasMemberAlreadyVotedOnVotingSession = memberVotes.size() > 0;
 		if (hasMemberAlreadyVotedOnVotingSession) {
