@@ -20,7 +20,6 @@
 		<maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
 		<start-class>com.votingpoll.VotingSessionServicesApplication</start-class>
-		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
 	<packaging>jar</packaging>

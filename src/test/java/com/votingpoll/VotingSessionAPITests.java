@@ -53,6 +53,27 @@ public class VotingSessionAPITests {
 	}
 	
 	@Test
+	public void shouldNotCreateNewVotingSessionWithZeroOrNegativeID() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":0, \"name\":\"name0\"}"))
+				.andExpect(status().isBadRequest());
+		
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":-1, \"name\":\"name-1\"}"))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void shouldNotCreateNewVotingSessionWithShortName() throws Exception {
+		mockMvc.perform(post("/v1/sessions")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"id\":112233, \"name\":\"n1\"}"))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
 	public void shouldNotCreateNewVotingSessionWithNoName() throws Exception {
 		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +94,10 @@ public class VotingSessionAPITests {
 				.content("{\"id\":2, \"minutes\":\"30\"}"))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value("2"))
-				.andExpect(jsonPath("$.minutes").value("30"));
+				.andExpect(jsonPath("$.minutes").value("30"))
+				.andExpect(jsonPath("$.startDate").exists())
+				.andExpect(jsonPath("$.yesTotalVotes").value("0"))
+				.andExpect(jsonPath("$.yesTotalVotes").value("0"));
 	}
 	
 	@Test
@@ -155,7 +179,7 @@ public class VotingSessionAPITests {
 				.param("votingSessionId", "444")
 				.param("memberId", "12")
 				.param("voteYesOrNo", "NO"))
-				.andExpect(status().isCreated());
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test

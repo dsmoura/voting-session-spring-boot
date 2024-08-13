@@ -53,24 +53,34 @@ public class VotingSessionController {
 	@ResponseStatus(HttpStatus.CREATED)
 	VotingSession saveVotingSession(@RequestBody VotingSession votingSession) {
 		Optional<VotingSession> vs = votingSessionRepository.findById(votingSession.getId());
-		if (vs.isPresent()) {
-			//start voting session
-			boolean shallCreateVotingSession = vs.get().getMinutes() == null;
-			if (shallCreateVotingSession) {
-				boolean shallSetDefaultDuration = votingSession.getMinutes() == null;
-				if (shallSetDefaultDuration) {
-					vs.get().setMinutes(DEFAULT_MINUTES_DURATION);
-				} else {
-					vs.get().setMinutes(votingSession.getMinutes());
-				}
-				vs.get().setStartDate(new Date());
-				return votingSessionRepository.save(vs.get());
+		
+		boolean shallCreateNewVotingSession = !vs.isPresent();
+		if (shallCreateNewVotingSession) {
+			if (votingSession.getId() <= 0) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Voting Session ID");
 			}
-			else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voting session already started.");
+			if (votingSession.getName().length() < 5) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Voting Session Name must have 5 characters at least.");
 			}
+			return votingSessionRepository.save(new VotingSession(votingSession.getId(),
+																	votingSession.getName()));	//save new voting session
 		}
-		return votingSessionRepository.save(votingSession);
+		
+		boolean hasVotingSessionAlreadyStarted = vs.get().getMinutes() != null;
+		if (hasVotingSessionAlreadyStarted) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session already started previously.");
+		}
+		
+		boolean shallSetDefaultDuration = votingSession.getMinutes() == null;
+		if (shallSetDefaultDuration) {
+			vs.get().setMinutes(DEFAULT_MINUTES_DURATION);
+		} else {
+			vs.get().setMinutes(votingSession.getMinutes());
+		}
+		vs.get().setStartDate(new Date());
+		vs.get().setYesTotalVotes((long) 0);
+		vs.get().setNoTotalVotes((long) 0);
+		return votingSessionRepository.save(vs.get());	//start voting session
 	}
 	
 	@Operation(summary = "Vote on an existing session.")
@@ -80,17 +90,24 @@ public class VotingSessionController {
 	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
 													@RequestParam Long memberId,
 													@RequestParam String voteYesOrNo) {
-		if (votingSessionId == null) {
-			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
+		Optional<VotingSession> vs = votingSessionRepository.findById(votingSessionId);
+		if (vs.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session doesn't exist.");
 		}
+		if (vs.get().getMinutes() == null || vs.get().getMinutes().equals(0)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session hasn't started yet.");
+		}
+		
 		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
-		if (memberVotes.size() > 0) {
+		boolean hasMemberAlreadyVotedOnVotingSession = memberVotes.size() > 0;
+		if (hasMemberAlreadyVotedOnVotingSession) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
 		}
-		if (!voteYesOrNo.equals(YES_VOTE) && !voteYesOrNo.equals(NO_VOTE)) {
+		boolean isValidVoteYesOrNo = voteYesOrNo.equals(YES_VOTE) || voteYesOrNo.equals(NO_VOTE);
+		if (!isValidVoteYesOrNo) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
 		}
-		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, voteYesOrNo));
+		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, voteYesOrNo));	//vote!
 		
 		return ResponseEntity.created(ServletUriComponentsBuilder
 			    						.fromCurrentRequestUri()
