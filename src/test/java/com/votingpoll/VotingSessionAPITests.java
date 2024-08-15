@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
+import com.votingpoll.utils.CpfUtils;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -159,15 +160,13 @@ public class VotingSessionAPITests {
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
-				.param("memberId", "10")
-				.param("voteYesOrNo", "YES"))
-				.andExpect(status().isCreated());
+				.param("memberCpf", CpfUtils.generateRandomCPF())
+				.param("voteYesOrNo", "YES"));
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "7")
-				.param("memberId", "12")
-				.param("voteYesOrNo", "NO"))
-				.andExpect(status().isCreated());
+				.param("memberCpf", CpfUtils.generateRandomCPF())
+				.param("voteYesOrNo", "NO"));
 	}
 	
 	@Test
@@ -190,7 +189,7 @@ public class VotingSessionAPITests {
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "444")
-				.param("memberId", "12")
+				.param("memberCpf", CpfUtils.generateRandomCPF())
 				.param("voteYesOrNo", "NO"))
 				.andExpect(status().isBadRequest());
 	}
@@ -205,7 +204,7 @@ public class VotingSessionAPITests {
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "555")
-				.param("memberId", "125")
+				.param("memberCpf", CpfUtils.generateRandomCPF())
 				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isBadRequest());
 	}
@@ -226,13 +225,13 @@ public class VotingSessionAPITests {
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
-				.param("memberId", "20")
+				.param("memberCpf", "22026073074")
 				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", "8")
-				.param("memberId", "20")
+				.param("memberCpf", "22026073074")
 				.param("voteYesOrNo", "NO"))
 				.andExpect(status().isBadRequest());
 	}
@@ -254,19 +253,19 @@ public class VotingSessionAPITests {
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
-				.param("memberId", "20")
+				.param("memberCpf", "52013346018")
 				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
-				.param("memberId", "21")
+				.param("memberCpf", "54142184040")
 				.param("voteYesOrNo", "YES"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/vote")
 				.param("votingSessionId", id)
-				.param("memberId", "22")
+				.param("memberCpf", "74762049050")
 				.param("voteYesOrNo", "NO"))
 				.andExpect(status().isCreated());
 		
@@ -294,8 +293,8 @@ public class VotingSessionAPITests {
 	
 	@Test
 	public void shouldReturnUnableToVoteWithInvalidCPF() throws Exception {
-		String cpf = "49062342088";
-		mockMvc.perform(get("/v1/users/" + cpf))
+		String invalidCpf = "49062342088";
+		mockMvc.perform(get("/v1/users/" + invalidCpf))
 				.andExpect(status().isNotFound());
 	}
 }

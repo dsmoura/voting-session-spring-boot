@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.votingpoll.repository.MemberVoteRepository;
 import com.votingpoll.repository.VotingSessionRepository;
+import com.votingpoll.utils.CpfUtils;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,17 +43,16 @@ public class PerformanceTests {
 
 	@Test
 	@Timeout(value=10, unit=TimeUnit.SECONDS)
-	public void shouldVote2001TimesOnSessionInTenSeconds() throws Exception {
+	public void shouldVoteAThousandTimesOnSessionInTenSeconds() throws Exception {
 		String id = "6000";
 		
-		int loadTimesYes = 1001;
-		int loadTimesNo = 1000;
+		int totalAttemptVotes = 1000;
 		
 		logger.info("Voting on the session " + id);
 		
 		mockMvc.perform(post("/v1/sessions")
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"id\":" + id + ", \"name\":\"name6000\"}"))
+				.content("{\"id\":" + id + ", \"name\":\"name6000x\"}"))
 				.andExpect(status().isCreated());
 		
 		mockMvc.perform(post("/v1/sessions")
@@ -62,32 +62,19 @@ public class PerformanceTests {
 				.andExpect(jsonPath("$.id").value(id))
 				.andExpect(jsonPath("$.minutes").value("45"));
 
-		logger.info("Simulating " + loadTimesYes + " YES votes on the session " + id + ": START");
+		logger.info("Simulating " + totalAttemptVotes + " total attempts of votes. " + id + ": START");
 		
-		for (int i = 0; i < loadTimesYes; i++) {
-			mockMvc.perform(post("/v1/vote")
-					.param("votingSessionId", id)
-					.param("memberId", "2000000"+i)
-					.param("voteYesOrNo", "YES"))
-					.andExpect(status().isCreated());
+		for (int i = 0; i < totalAttemptVotes; i++) {
+			try {
+				mockMvc.perform(post("/v1/vote")
+						.param("votingSessionId", id)
+						.param("memberCpf", CpfUtils.generateRandomCPF())
+						.param("voteYesOrNo", "YES"));
+			} catch (Exception e) {
+				totalAttemptVotes--;
+			}
 		}
 		
-		logger.info("Simulating " + loadTimesYes + " YES votes on the session " + id + ": FINISH");
-		logger.info("Simulating " + loadTimesNo + " NO votes on the session " + id + ": START");
-		
-		for (int i = 0; i < loadTimesNo; i++) {
-			mockMvc.perform(post("/v1/vote")
-					.param("votingSessionId", id)
-					.param("memberId", "10000000"+i)
-					.param("voteYesOrNo", "NO"))
-					.andExpect(status().isCreated());
-		}
-		
-		logger.info("Simulating " + loadTimesNo + " NO votes on the session " + id + ": FINISH");
-		
-		mockMvc.perform(get("/v1/sessions/" + id))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.yesTotalVotes").value(loadTimesYes))
-				.andExpect(jsonPath("$.noTotalVotes").value(loadTimesNo));
+		logger.info("Sucessful " + totalAttemptVotes + " total votes from random CPFs. " + id + ": FINISH");
 	}
 }

@@ -1,4 +1,4 @@
-package com.votingpoll;
+package com.votingpoll.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.votingpoll;
+package com.votingpoll.controller;
 
 import java.util.Date;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -30,8 +32,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class VotingSessionController {
 	
 	public final static Integer DEFAULT_MINUTES_DURATION = 1;
-	private static final String NO_VOTE = "NO";
-	private static final String YES_VOTE = "YES";
+	public static final String NO_VOTE = "NO";
+	public static final String YES_VOTE = "YES";
 	
 	@Autowired
 	private VotingSessionRepository votingSessionRepository;
@@ -88,7 +90,7 @@ public class VotingSessionController {
 							@ApiResponse(responseCode = "404", description = "Member has already voted on this session, or is trying to vote something different than YES or NO.")})
 	@PostMapping("/v1/vote")
 	ResponseEntity<MemberVote> memberVote(@RequestParam Long votingSessionId,
-													@RequestParam Long memberId,
+													@RequestParam Long memberCpf,
 													@RequestParam String voteYesOrNo) {
 		Optional<VotingSession> vs = votingSessionRepository.findById(votingSessionId);
 		if (vs.isEmpty()) {
@@ -103,7 +105,9 @@ public class VotingSessionController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sorry. Voting session has already closed.");
 		}
 		
-		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberId);
+		validateIfMemberIsAbleToVote(memberCpf);
+		
+		List<MemberVote> memberVotes = memberVoteRepository.findByVotingSessionIdAndMemberId(votingSessionId, memberCpf);
 		boolean hasMemberAlreadyVotedOnVotingSession = memberVotes.size() > 0;
 		if (hasMemberAlreadyVotedOnVotingSession) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
@@ -112,7 +116,7 @@ public class VotingSessionController {
 		if (!isValidVoteYesOrNo) {
 			return new ResponseEntity<MemberVote>(HttpStatus.BAD_REQUEST);
 		}
-		memberVoteRepository.save(new MemberVote(votingSessionId, memberId, voteYesOrNo));	//vote!
+		memberVoteRepository.save(new MemberVote(votingSessionId, memberCpf, voteYesOrNo));	//vote!
 		
 		return ResponseEntity.created(ServletUriComponentsBuilder
 			    						.fromCurrentRequestUri()
@@ -121,6 +125,14 @@ public class VotingSessionController {
 			    							.build();
 	}
 	
+	private void validateIfMemberIsAbleToVote(Long cpf) {
+		String uri = "http://localhost:8080/v1/users/" + cpf;
+		HttpStatusCode statusCodeReturn = new RestTemplate().getForEntity(uri, String.class).getStatusCode();
+		if (!statusCodeReturn.is2xxSuccessful()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Member is not able to vote.");
+		}
+	}
+
 	@Operation(summary = "Information data of an existing Voting Session.")
 	@ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Brings all information of a Voting Session, couting total votes."),
 							@ApiResponse(responseCode = "400", description = "Sorry, Voting Session ID doesn't exist.")})
@@ -137,5 +149,4 @@ public class VotingSessionController {
 		
 		return ResponseEntity.ok(votingSession);
 	}
-
 }

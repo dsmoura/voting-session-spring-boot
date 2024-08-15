@@ -25,6 +25,7 @@ According to the reference <https://www.mongodb.com/blog/post/6-rules-of-thumb-f
 All code was developed on TDD approach with Spring MVC Test framework - MockMvc.
 <https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html>
 To run the tests please use the Maven command <code>mvn test</code>
+PS.: the application must be running for the tests pass, there are API calls.
 
 ### Versioning
 All APIS started already on v1 version, through URI Path.
