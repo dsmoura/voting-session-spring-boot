@@ -1,9 +1,6 @@
 # Voting Session Spring Boot RESTFul API Application
 Be welcome :-)
 
-### Please take a look at an example running on AWS EC2
-<http://54.207.40.174:8080/swagger>
-
 ### Running this application
 1. Please clone this repository;
 2. Build it on Maven command <code>mvn clean install</code>.
