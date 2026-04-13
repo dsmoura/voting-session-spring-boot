@@ -30,6 +30,7 @@ All APIS started already on v1 version, through URI Path.
 ### Performance tests
 Running on a local computer (Intel i7, 8GiB RAM) with local MongoDB database.
 
+```
 Load Tests run -> 1001 tests on around 2.5s + 1000 tests in a row on around 2s.
 2024-08-08T20:27:39.351-03:00  INFO 16077 --- [           main] com.votingpoll.PerformanceTests          : Voting on the session 6000
 2024-08-08T20:27:39.357-03:00  INFO 16077 --- [           main] com.votingpoll.PerformanceTests          : Simulating 1001 YES votes on the session 6000: START
@@ -47,3 +48,4 @@ Random generated valid CPFs to test.
 User API will deny vote on sessions for odd number CPFs.
 "22026073074" ABLE_TO_VOTE (even number)
 "28305251837" UNABLE_TO_VOTE (odd number)
+```
